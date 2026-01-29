@@ -33,7 +33,7 @@ body {
   font-family: 'Roboto', serif;
   font-weight: 300;
   font-size: 14px;
-  gap: 40px;
+  gap: 10px;
   margin-top: 20px;
   padding: 15px;
   border-top: 1px solid #CDBEB4;
@@ -41,13 +41,37 @@ body {
 }
 
 .month {
-  cursor: pointer
+  cursor: pointer;
+  padding: 8px 15px;
+  border-radius: 20px;
 }
 
 
 .active {
-  padding: 8px 15px;
-  border-radius: 20px;
   background-color: #DC874B;
   color: #fff;
+}
+
+.map-container {
+  position: relative;
+}
+
+.zoom-icons {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+
+.zoom-icon {
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  background-color: #fff;
+  border-color: transparent;
+  padding: 8px;
+  border-radius: 10px;
 }

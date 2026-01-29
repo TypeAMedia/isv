@@ -12,6 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
     rel="stylesheet">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
   <link rel="stylesheet" href="main.css" />
   <title>The Vitamin D Index</title>
 </head>
@@ -25,24 +26,37 @@
     </div>
 
     <div class="calendar">
-      <div class="all month active"> All</div>
-      <div class="jan month"> Jan</div>
-      <div class="feb month"> Feb</div>
-      <div class="mar month"> Mar</div>
-      <div class="apr month"> Apr</div>
-      <div class="may month"> May</div>
-      <div class="jun month"> Jun</div>
-      <div class="jul month"> Jul</div>
-      <div class="aug month"> Aug</div>
-      <div class="sep month"> Sep</div>
-      <div class="oct month"> Oct</div>
-      <div class="nov month"> Nov</div>
-      <div class="dec month"> Dec</div>
+      <div class="all month active" data-month="all"> All</div>
+      <div class="jan month" data-month="data-january"> Jan</div>
+      <div class="feb month" data-month="data-february"> Feb</div>
+      <div class="mar month" data-month="data-march"> Mar</div>
+      <div class="apr month" data-month="data-april"> Apr</div>
+      <div class="may month" data-month="data-may"> May</div>
+      <div class="jun month" data-month="data-june"> Jun</div>
+      <div class="jul month" data-month="data-july"> Jul</div>
+      <div class="aug month" data-month="data-august"> Aug</div>
+      <div class="sep month" data-month="data-septermber"> Sep</div>
+      <div class="oct month" data-month="data-october"> Oct</div>
+      <div class="nov month" data-month="data-november"> Nov</div>
+      <div class="dec month" data-month="data-december"> Dec</div>
     </div>
-    <div id="map"> </div>
+    <div class="map-container">
+      <div id="map"> </div>
+      <!-- reset buttons -->
+      <div class="zoom-icons">
+        <button class="zoom-icon plus">
+          <img src="./images/zoomplus.svg" alt='zoom-plus' />
+        </button>
+        <button class="zoom-icon minus">
+          <img src="./images/zoomminus.svg" alt='zoom-minus' />
+        </button>
+      </div>
+    </div>
+
   </div>
 
-  <script sr="/js/map.js"></script>
+
+  <script src="/js/map.js"></script>
   <script src='/js/main.js'> </script>
 
 </body>
