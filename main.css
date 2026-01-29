@@ -1,16 +1,17 @@
 body {
-  background-color: #f5eae0;
-  font-family: "Cormorant", serif;
-  margin-top: 30px;
+  margin: 0
 }
 
 .main-container {
   max-width: 850px;
+  background-color: #f5eae0;
   margin: 0 auto;
+  padding: 10px 0px;
 }
 
 .header {
   text-align: center;
+  font-family: "Cormorant", serif;
 }
 
 .heading {
@@ -28,10 +29,25 @@ body {
 
 .calendar {
   display: flex;
-  gap: 5px;
+  align-items: center;
+  font-family: 'Roboto', serif;
+  font-weight: 300;
+  font-size: 14px;
+  gap: 40px;
   margin-top: 20px;
-  padding: 20px;
+  padding: 15px;
   border-top: 1px solid #CDBEB4;
   border-bottom: 1px solid #CDBEB4
 }
 
+.month {
+  cursor: pointer
+}
+
+
+.active {
+  padding: 8px 15px;
+  border-radius: 20px;
+  background-color: #DC874B;
+  color: #fff;
+}
