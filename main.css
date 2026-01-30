@@ -91,15 +91,21 @@ body {
 .data-table thead th {
   top: 0;
   z-index: 10;
+
 }
 
 /* Table header styling */
 .data-table thead th {
   text-align: left;
   padding: 10px;
-  font-size: 16px;
+  font-size: 15px;
   font-family: 'Roboto';
   background-color: #f0d6c1;
+  font-weight: lighter !important;
+  text-shadow:
+  0 10px 4px rgba(0, 0, 0, 0.15),
+  0 12px 20px rgba(0, 0, 0, 0.12),
+  0 12px 24px rgba(0, 0, 0, 0.10);
 }
 
 /* Make tbody scrollable with a fixed height */
