@@ -28,7 +28,7 @@ body {
 }
 
 .calendar {
-  overflow-x:auto;
+  overflow-x: auto;
   display: flex;
   align-items: center;
   font-family: 'Roboto', serif;
@@ -216,4 +216,11 @@ body {
 
 *:focus {
   outline: none;
+}
+
+
+@media (max-width: 600px) {
+  .rank-and-destination {
+    width: 290px;
+  }
 }
