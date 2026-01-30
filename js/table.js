@@ -64,10 +64,14 @@ function drawTable(data) {
       addCityTooltips()
       // Remove previous highlights (optional)
       d3.selectAll('.rank-and-destination').style('background-color', null)
+      d3.selectAll('.flag').style('font-weight', null)
+      d3.selectAll('td').style('font-weight', null)
 
       // Highlight clicked row by setting border on all its cells
       d3.select(this).selectAll('.rank-and-destination')
         .style('background-color', '#f0d6c1')
+        d3.select(this).selectAll('.flag').style('font-weight', 'bold')
+        d3.select(this).selectAll('td').style('font-weight', 'bold')
     })
 
     // Other columns with RGBA backgrounds

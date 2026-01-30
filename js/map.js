@@ -142,6 +142,7 @@ function map(mapContainer, geojson, data) {
           .attr("fill", city.COLOR) // Adjust color for city circles
           .attr("stroke", "#fff")
           .attr("stroke-width", 0.5)
+          .attr('class', 'city-circle')
 
         // Optionally, add labels for cities
         features.append("text")
