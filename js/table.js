@@ -57,22 +57,53 @@ function drawTable(data) {
       <div class='flag'>${row.CITY}, ${row.COUNTRY}</div>
     `)
 
-
-
     // Select all table rows
-    d3.selectAll('tr').on('click', function () {
-      addCityTooltips()
-      // Remove previous highlights (optional)
+    tr.on('click', function () {
+
+      // Reset styles
       d3.selectAll('.rank-and-destination').style('background-color', null)
       d3.selectAll('.flag').style('font-weight', null)
       d3.selectAll('td').style('font-weight', null)
-
-      // Highlight clicked row by setting border on all its cells
-      d3.select(this).selectAll('.rank-and-destination')
+    
+      // Highlight row
+      d3.select(this).select('.rank-and-destination')
         .style('background-color', '#f0d6c1')
-        d3.select(this).selectAll('.flag').style('font-weight', 'bold')
-        d3.select(this).selectAll('td').style('font-weight', 'bold')
+    
+      d3.select(this).selectAll('.flag, td')
+        .style('font-weight', 'bold')
+    
+        console.log(row)
+      // SELECT THE CORRECT CIRCLE
+      const circle = d3.select(`circle[data-city="${row.CITY}"]`)
+    
+      console.log(circle.node()) // should NOT be null
+    
+      // if (!circle.empty()) {
+    
+      //   const tooltipContent = `
+      //     <div class='tooltip'> 
+      //       <div class='rank' style='background-color: ${row.COLOR}'>
+      //         ${Math.floor(row["OVERALL RANK"]) || 'N/A'}
+      //       </div>
+      //       <div class='fi fi-${row.CODE}'></div>
+      //       <div>${row.CITY},</div>
+      //       <div>${row.COUNTRY}</div>
+      //     </div>
+      //   `
+    
+      //   tippy(circle.node(), {
+      //     content: tooltipContent,
+      //     allowHTML: true,
+      //     theme: 'light',
+      //     trigger: 'manual',
+      //     placement: 'top'
+      //   })
+    
+      //   // show tooltip programmatically
+      //   circle.node()._tippy.show()
+      // }
     })
+    
 
     // Other columns with RGBA backgrounds
     numericColumns.forEach((col, i) => {
