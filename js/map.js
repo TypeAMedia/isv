@@ -115,6 +115,7 @@ function map(mapContainer, geojson, data) {
     .on("click", function (event, d) {
       svg.selectAll('circle').remove()
       svg.selectAll('.circle-text').remove()
+      console.log(data)
 
       const x = d3.select(this).attr("cx") // Retrieve cx attribute
       const y = d3.select(this).attr("cy") // Retrieve cy attribute

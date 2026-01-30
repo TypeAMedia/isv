@@ -14,9 +14,21 @@ const addIsoCodes = (monthData, vitaminData) => {
   vitaminData.forEach(city => {
     vitaminDataMap.set(city.CITY, city.CODE)
   })
-
   monthData.forEach(city => {
     city.CODE = vitaminDataMap.get(city.CITY) || null
+  })
+}
+
+const addLongLat = (monthData, vitaminData) => {
+  const vitaminDataMapLong = new Map()
+  const vitaminDataMapLat = new Map()
+  vitaminData.forEach(city => {
+    vitaminDataMapLat.set(city.CITY, city.LATITUDE)
+    vitaminDataMapLong.set(city.CITY, city.LONGITUDE)
+  })
+  monthData.forEach(city => {
+    city.LATITUDE =vitaminDataMapLat.get(city.CITY) || null
+    city.LONGITUDE =vitaminDataMapLong.get(city.CITY) || null
   })
 }
 
@@ -71,6 +83,7 @@ document.querySelectorAll('.month').forEach(monthElement => {
             city.COLOR = getColor(index)
           })
           addIsoCodes(monthData, vitaminData)
+          addLongLat(monthData, vitaminData)
           d3.json('./data/countries.geo.json').then((datum) => {
             map('#map', datum, monthData)
             drawTable(monthData)
