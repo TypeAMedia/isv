@@ -27,11 +27,12 @@ function drawTable(data) {
     const tr = body.append("tr")
 
     // Add rank and destination in one row
-    const rankAndDestination = tr.append("td").attr("class", "rank-and-destination");
+    const rankAndDestination = tr.append("td").attr("class", "rank-and-destination")
     rankAndDestination.html(`
       <div class='rank' style='background-color: ${row.COLOR};'>${index + 1}</div>
+     <div class='fi fi-${row.CODE}'> </div>
       <div class='flag'>${row.CITY}, ${row.COUNTRY}</div> 
-    `);
+    `)
 
 
     // Add other data columns

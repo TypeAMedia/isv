@@ -173,6 +173,7 @@ function addCityTooltips() {
         const tooltipContent = `
  <div class='tooltip'> 
  <div class='rank' style='background-color: ${city.COLOR}'> ${Math.floor(city["OVERALL RANK"]) || 'N/A'} </div>
+ <div class='fi fi-${city.CODE}'> </div>
  <div> ${city.CITY},</div>
  <div>${city.COUNTRY} </div>
  </div>`
