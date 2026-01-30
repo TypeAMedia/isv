@@ -108,21 +108,6 @@ body {
   0 12px 24px rgba(0, 0, 0, 0.10);
 }
 
-/* Make tbody scrollable with a fixed height */
-/* .data-table tbody {
-  display: block; 
-  max-height: 600px; 
-  overflow-y: auto; 
-  width: 100%; 
-} */
-
-/* Ensure thead and tbody columns align */
-/* .data-table thead, .data-table tbody tr {
-  display: table;
-  width: 100%;
-  table-layout: fixed; 
-} */
-
 /* Table row styling */
 .data-table tbody tr {
   border-bottom: 1px solid #e0d6d1;
