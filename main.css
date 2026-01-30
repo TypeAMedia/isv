@@ -75,3 +75,141 @@ body {
   padding: 8px;
   border-radius: 10px;
 }
+
+/* Table container styling */
+#table-container {
+  margin: 20px auto;
+  max-width: 100%;
+  border-radius: 10px;
+  border-collapse: collapse;
+  background-color: #f5eae0;
+  height: 600px;
+  overflow-y: auto;
+}
+
+/* Make table header sticky */
+.data-table thead th {
+  top: 0;
+  z-index: 10;
+}
+
+/* Table header styling */
+.data-table thead th {
+  text-align: left;
+  padding: 10px;
+  font-size: 16px;
+  font-family: 'Roboto';
+  background-color: #f0d6c1;
+}
+
+/* Make tbody scrollable with a fixed height */
+/* .data-table tbody {
+  display: block; 
+  max-height: 600px; 
+  overflow-y: auto; 
+  width: 100%; 
+} */
+
+/* Ensure thead and tbody columns align */
+/* .data-table thead, .data-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed; 
+} */
+
+/* Table row styling */
+.data-table tbody tr {
+  border-bottom: 1px solid #e0d6d1;
+  font-size: 18px;
+  text-align: center;
+}
+
+/* Table cell styling */
+.data-table td {
+  padding: 10px;
+  font-family: 'Roboto';
+  font-size: 14px;
+}
+
+.rank-and-destination {
+  display: flex;
+  gap: 10px;
+  font-family: "Cormorant", serif !important;
+  font-size: 18px !important;
+  align-items: center;
+}
+
+.rank {
+  font-weight: bold;
+  color: #fff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+  font-size: 14px !important;
+  font-family: 'Roboto' !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.data-table td.rainy-days,
+.data-table td.rainfall,
+.data-table td[style*="background-color"] {
+  background-color: #d4f0f0;
+  border-radius: 5px;
+  color: #333;
+}
+
+.data-table td.hours-of-sunshine {
+  background-color: #d4f0d4;
+  border-radius: 5px;
+  color: #333;
+}
+
+.data-table td.hours-of-daylight {
+  background-color: #f7e4d9;
+  border-radius: 5px;
+  color: #333;
+}
+
+.data-table td.avg-uv {
+  background-color: #f7d9d9;
+  border-radius: 5px;
+  color: #333;
+}
+
+.data-table td.highest-avg-temp {
+  background-color: #f7c6c6;
+  border-radius: 5px;
+  color: #333;
+}
+
+/* Adjust column widths for better alignment */
+
+
+.data-table th:nth-child(2),
+.data-table td:nth-child(2) .data-table th:nth-child(3),
+.data-table td:nth-child(3),
+.data-table th:nth-child(4),
+.data-table td:nth-child(4),
+.data-table th:nth-child(5),
+.data-table td:nth-child(5),
+.data-table th:nth-child(6),
+.data-table td:nth-child(6),
+.data-table th:nth-child(7),
+.data-table td:nth-child(7) {
+  width: 10%;
+}
+
+/* Tooltip */
+
+.tooltip {
+  font-family: "Cormorant", serif !important;
+  font-size: 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

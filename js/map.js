@@ -1,6 +1,6 @@
 function map(mapContainer, geojson, data) {
   const container = d3.select(mapContainer)
-  console.log(container.node())
+
   const params = {
     width: container.node().getBoundingClientRect().width,
     height: window.innerWidth > 724 ? 500 : 350,
@@ -61,7 +61,6 @@ function map(mapContainer, geojson, data) {
     city.countrySum = countryCounts.get(city.COUNTRY) || 0
   })
 
-  console.log(data)
 
   // Add countrySum property to each city
   data.forEach(city => {
@@ -156,5 +155,32 @@ function map(mapContainer, geojson, data) {
           .attr("fill", "#000") // Text color
           .attr("font-size", "10px") // Font size
       })
+
+      // Add tooltips to city circles
+      addCityTooltips()
+    })
+
+  // Add tooltips to initial city circles
+  addCityTooltips()
+}
+
+// Add Tippy.js tooltips to all city circles
+function addCityTooltips() {
+  d3.selectAll("circle")
+    .each(function (d) {
+      const city = d3.select(this).datum()
+      if (city) {
+        const tooltipContent = `
+ <div class='tooltip'> 
+ <div class='rank' style='background-color: ${city.COLOR}'> ${Math.floor(city["OVERALL RANK"]) || 'N/A'} </div>
+ <div> ${city.CITY},</div>
+ <div>${city.COUNTRY} </div>
+ </div>`
+        tippy(this, {
+          content: tooltipContent,
+          allowHTML: true,
+          theme: 'light',
+        })
+      }
     })
 }
