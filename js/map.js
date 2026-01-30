@@ -108,6 +108,7 @@ function map(mapContainer, geojson, data) {
     if (countryData) {
       drawCircles(countryData, centroid)
     }
+
   })
 
   features.selectAll("circle")
@@ -160,9 +161,10 @@ function map(mapContainer, geojson, data) {
       addCityTooltips()
     })
 
-  // Add tooltips to initial city circles
-  addCityTooltips()
+    addCityTooltips()
 }
+
+
 
 // Add Tippy.js tooltips to all city circles
 function addCityTooltips() {
@@ -185,3 +187,4 @@ function addCityTooltips() {
       }
     })
 }
+

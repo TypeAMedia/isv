@@ -3,9 +3,22 @@ d3.csv('./data/data-vitamin.csv').then((data) => {
   d3.json('./data/countries.geo.json').then((datum) => {
     map('#map', datum, data)
   })
+  drawTable(data)
 })
 
 const colors = ['#cc0100', '#e06666', '#ea9999', '#f5cbcc', '#e69138', '#f9cb9c', '#fce5cd', '#93c47d', '#b7d7a8', '#d9ead3',]
+
+// Add ISO codes to each city in the month data
+const addIsoCodes = (monthData, vitaminData) => {
+  const vitaminDataMap = new Map()
+  vitaminData.forEach(city => {
+    vitaminDataMap.set(city.CITY, city.CODE)
+  })
+
+  monthData.forEach(city => {
+    city.CODE = vitaminDataMap.get(city.CITY) || null
+  })
+}
 
 // Add event listener to change active status on month click
 document.querySelectorAll('.month').forEach(monthElement => {
@@ -57,6 +70,7 @@ document.querySelectorAll('.month').forEach(monthElement => {
           monthData.forEach((city, index) => {
             city.COLOR = getColor(index)
           })
+          addIsoCodes(monthData, vitaminData)
           d3.json('./data/countries.geo.json').then((datum) => {
             map('#map', datum, monthData)
             drawTable(monthData)
@@ -76,7 +90,4 @@ document.querySelectorAll('.month').forEach(monthElement => {
 })
 
 
-// Load data-vitamin and draw the table
-d3.csv('./data/data-vitamin.csv').then((data) => {
-  drawTable(data)
-})
+
