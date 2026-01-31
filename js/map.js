@@ -80,6 +80,7 @@ function map(mapContainer, geojson, data) {
         .attr("fill", countryData.countrySum !== 1 ? "#B29480" : countryData.COLOR)
         .attr("stroke", "#fff")
         .attr("stroke-width", 0.5)
+        .attr('data-city', countryData.CITY)
 
       features.append("text")
         .attr("class", "circle-text")
@@ -133,6 +134,7 @@ function map(mapContainer, geojson, data) {
             .attr("fill", city.COLOR)
             .attr("stroke", "#fff")
             .attr("stroke-width", 0.5)
+            .attr('data-city', city.CITY)
         })
 
         addCityTooltips()
@@ -151,8 +153,6 @@ function map(mapContainer, geojson, data) {
 
     drawCountryCircles()
   })
-
-
   drawCountryCircles()
 }
 

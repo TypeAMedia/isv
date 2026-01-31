@@ -137,6 +137,7 @@ body {
   font-family: "Cormorant", serif !important;
   font-size: 18px !important;
   align-items: center;
+  cursor: pointer
 }
 
 .rank {

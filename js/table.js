@@ -75,33 +75,32 @@ function drawTable(data) {
         console.log(row)
       // SELECT THE CORRECT CIRCLE
       const circle = d3.select(`circle[data-city="${row.CITY}"]`)
+  
     
-      console.log(circle.node()) // should NOT be null
+      if (!circle.empty()) {
     
-      // if (!circle.empty()) {
+        const tooltipContent = `
+          <div class='tooltip'> 
+            <div class='rank' style='background-color: ${row.COLOR}'>
+              ${Math.floor(row["OVERALL RANK"]) || 'N/A'}
+            </div>
+            <div class='fi fi-${row.CODE}'></div>
+            <div>${row.CITY},</div>
+            <div>${row.COUNTRY}</div>
+          </div>
+        `
     
-      //   const tooltipContent = `
-      //     <div class='tooltip'> 
-      //       <div class='rank' style='background-color: ${row.COLOR}'>
-      //         ${Math.floor(row["OVERALL RANK"]) || 'N/A'}
-      //       </div>
-      //       <div class='fi fi-${row.CODE}'></div>
-      //       <div>${row.CITY},</div>
-      //       <div>${row.COUNTRY}</div>
-      //     </div>
-      //   `
+        tippy(circle.node(), {
+          content: tooltipContent,
+          allowHTML: true,
+          theme: 'light',
+          trigger: 'manual',
+          placement: 'top'
+        })
     
-      //   tippy(circle.node(), {
-      //     content: tooltipContent,
-      //     allowHTML: true,
-      //     theme: 'light',
-      //     trigger: 'manual',
-      //     placement: 'top'
-      //   })
-    
-      //   // show tooltip programmatically
-      //   circle.node()._tippy.show()
-      // }
+        // show tooltip programmatically
+        circle.node()._tippy.show()
+      }
     })
     
 
