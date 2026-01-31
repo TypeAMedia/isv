@@ -44,10 +44,9 @@ function map(mapContainer, geojson, data) {
       features.attr("transform", event.transform)
     })
 
-  svg.call(zoom)
+  svg.call(zoom).on("wheel.zoom", null).on('dblclick.zoom', null)
 
-  /* ================= DATA PREP ================= */
-
+  // Data Prep
   const countryCounts = d3.rollup(data, v => v.length, d => d.COUNTRY)
 
   data.forEach(city => {
