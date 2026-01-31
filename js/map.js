@@ -16,7 +16,8 @@ function map(mapContainer, geojson, data) {
     .attr('height', params.height)
     .style('cursor', 'pointer')
 
-  /* ================= PROJECTION ================= */
+
+  // Projection
 
   const projection = d3.geoMercator()
     .fitSize([params.width, params.height], geojson)
@@ -25,7 +26,7 @@ function map(mapContainer, geojson, data) {
 
   const features = svg.append("g")
 
-  /* ================= MAP PATHS ================= */
+  // Map paths
 
   features.selectAll("path")
     .data(geojson.features)
@@ -36,7 +37,7 @@ function map(mapContainer, geojson, data) {
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.7)
 
-  /* ================= ZOOM ================= */
+  // Zoom functionality
 
   const zoom = d3.zoom()
     .scaleExtent([1, 8])
@@ -57,8 +58,9 @@ function map(mapContainer, geojson, data) {
     .domain([0, d3.max(data, d => d.countrySum)])
     .range([5, 15])
 
-  /* ================= DRAW COUNTRY CIRCLES ================= */
 
+
+  // Draw country circles
   function drawCountryCircles() {
     features.selectAll("circle").remove()
     features.selectAll(".circle-text").remove()
@@ -96,8 +98,8 @@ function map(mapContainer, geojson, data) {
     addCityTooltips()
   }
 
-  /* ================= CLICK HANDLER ================= */
 
+  // Circle click handle
   function attachCircleClick() {
     features.selectAll("circle")
       .on("click", function (event, d) {
@@ -137,8 +139,7 @@ function map(mapContainer, geojson, data) {
       })
   }
 
-  /* ================= RESET / ZOOM BUTTONS ================= */
-
+  // Reset zoom buttons
   d3.select('.plus').on('click', () => {
     svg.transition().duration(750).call(zoom.scaleTo, 2)
   })
@@ -151,14 +152,12 @@ function map(mapContainer, geojson, data) {
     drawCountryCircles()
   })
 
-  /* ================= INIT ================= */
 
   drawCountryCircles()
 }
 
 
-/* ================= TOOLTIP ================= */
-
+// Tooltip functionality
 function addCityTooltips() {
   d3.selectAll("circle")
     .each(function (d) {
