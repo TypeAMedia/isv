@@ -70,6 +70,8 @@ function map(mapContainer, geojson, data) {
       const countryData = data.find(d => d.COUNTRY === countryName)
       if (!countryData) return
 
+      if (countryData.countrySum > 1) return
+
       const centroid = path.centroid(feature)
 
       features.append("circle")
@@ -154,6 +156,7 @@ function map(mapContainer, geojson, data) {
     drawCountryCircles()
   })
   drawCountryCircles()
+  return { attachCircleClick: attachCircleClick() }
 }
 
 
@@ -180,5 +183,6 @@ function addCityTooltips() {
         theme: 'light'
       })
     })
+
 }
 

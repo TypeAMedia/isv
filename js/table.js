@@ -75,7 +75,10 @@ function drawTable(data) {
         console.log(row)
       // SELECT THE CORRECT CIRCLE
       const circle = d3.select(`circle[data-city="${row.CITY}"]`)
-  
+
+      console.log(circle.node())
+
+      map.attachCircleClick
     
       if (!circle.empty()) {
     
