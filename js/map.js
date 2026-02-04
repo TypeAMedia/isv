@@ -1,3 +1,5 @@
+let clicked = false
+
 function map(mapContainer, geojson, data) {
   const container = d3.select(mapContainer)
 
@@ -10,6 +12,7 @@ function map(mapContainer, geojson, data) {
     marginRight: 10,
   }
 
+
   const svg = container
     .append('svg')
     .attr('width', params.width)
@@ -18,7 +21,6 @@ function map(mapContainer, geojson, data) {
 
 
   // Projection
-
   const projection = d3.geoMercator()
     .fitSize([params.width, params.height], geojson)
 
@@ -37,8 +39,8 @@ function map(mapContainer, geojson, data) {
     .attr("stroke", "#fff")
     .attr("stroke-width", 0.7)
 
-  // Zoom functionality
 
+  // Zoom functionality
   const zoom = d3.zoom()
     .scaleExtent([1, 8])
     .on("zoom", (event) => {
@@ -70,7 +72,6 @@ function map(mapContainer, geojson, data) {
       const countryData = data.find(d => d.COUNTRY === countryName)
       if (!countryData) return
 
-      if (countryData.countrySum > 1) return
 
       const centroid = path.centroid(feature)
 
@@ -106,7 +107,7 @@ function map(mapContainer, geojson, data) {
   function attachCircleClick() {
     features.selectAll("circle")
       .on("click", function (event, d) {
-
+        clicked = true
         features.selectAll("circle").remove()
         features.selectAll(".circle-text").remove()
 
@@ -132,7 +133,7 @@ function map(mapContainer, geojson, data) {
             .datum(city)
             .attr("cx", cx)
             .attr("cy", cy)
-            .attr("r", 5)
+            .attr("r", 4)
             .attr("fill", city.COLOR)
             .attr("stroke", "#fff")
             .attr("stroke-width", 0.5)
@@ -145,14 +146,17 @@ function map(mapContainer, geojson, data) {
 
   // Reset zoom buttons
   d3.select('.plus').on('click', () => {
-    svg.transition().duration(750).call(zoom.scaleTo, 2)
+    svg.transition().duration(750).call(zoom.scaleTo, 4)
+    d3.selectAll('circle').attr('r', 5.5)
+    d3.selectAll('.circle-text').attr('font-size', '6px')
   })
 
   d3.select('.minus').on('click', () => {
     svg.transition()
       .duration(750)
       .call(zoom.transform, d3.zoomIdentity)
-
+    d3.selectAll('circle').attr('r', (d) => circleScale(d.countrySum))
+    d3.selectAll('.circle-text').attr('font-size', '14px')
     drawCountryCircles()
   })
   drawCountryCircles()
@@ -164,6 +168,7 @@ function map(mapContainer, geojson, data) {
 function addCityTooltips() {
   d3.selectAll("circle")
     .each(function (d) {
+      if (d.countrySum > 1 && !clicked) return
       if (!d) return
 
       const tooltipContent = `

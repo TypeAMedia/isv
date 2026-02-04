@@ -110,11 +110,13 @@ body {
   font-weight: 300;
 
   /* your shadow stays */
-  text-shadow:
+  /* text-shadow:
     0 10px 4px rgba(0, 0, 0, 0.15),
     0 12px 20px rgba(0, 0, 0, 0.12),
-    0 12px 24px rgba(0, 0, 0, 0.10);
+    0 12px 24px rgba(0, 0, 0, 0.10); */
 }
+
+
 
 
 /* Table row styling */

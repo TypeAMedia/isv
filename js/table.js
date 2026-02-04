@@ -60,6 +60,11 @@ function drawTable(data) {
     // Select all table rows
     tr.on('click', function () {
 
+      // Move row to top
+      body.node().insertBefore(this, body.node().firstChild)
+
+ 
+
       // Reset styles
       d3.selectAll('.rank-and-destination').style('background-color', null)
       d3.selectAll('.flag').style('font-weight', null)
@@ -72,16 +77,10 @@ function drawTable(data) {
       d3.select(this).selectAll('.flag, td')
         .style('font-weight', 'bold')
     
-        console.log(row)
-      // SELECT THE CORRECT CIRCLE
+      // Select corresponding circle
       const circle = d3.select(`circle[data-city="${row.CITY}"]`)
-
-      console.log(circle.node())
-
-      map.attachCircleClick
     
       if (!circle.empty()) {
-    
         const tooltipContent = `
           <div class='tooltip'> 
             <div class='rank' style='background-color: ${row.COLOR}'>
@@ -101,10 +100,10 @@ function drawTable(data) {
           placement: 'top'
         })
     
-        // show tooltip programmatically
         circle.node()._tippy.show()
       }
     })
+    
     
 
     // Other columns with RGBA backgrounds
