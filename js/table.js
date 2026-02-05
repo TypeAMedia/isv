@@ -1,16 +1,15 @@
-// Keep track of the currently pinned row
+// Track currently pinned row
 let pinnedRow = null
 
 function drawTable(data) {
   const tableContainer = d3.select("#table-container")
   tableContainer.html("")
 
-  const table = tableContainer.append("table").attr("class", "data-table")
+  const table = tableContainer.append("table")
+    .attr("class", "data-table")
 
-  // Base colors for numeric columns
   const colors = ['#3BC3B7', '#13A098', '#AED457', '#FFBB56', '#F2A45C', '#FB8361']
 
-  // Table headers
   const headers = [
     "Destination",
     "Rainy Days",
@@ -21,8 +20,9 @@ function drawTable(data) {
     "Highest Avg. Temp"
   ]
 
-  const thead = table.append("thead").append("tr")
-  thead.selectAll("th")
+  table.append("thead")
+    .append("tr")
+    .selectAll("th")
     .data(headers)
     .enter()
     .append("th")
@@ -30,7 +30,7 @@ function drawTable(data) {
 
   const body = table.append("tbody")
 
-  // --- Helper: hex → rgba ---
+  // --- helpers ---
   function hexToRgba(hex, alpha) {
     const r = parseInt(hex.slice(1, 3), 16)
     const g = parseInt(hex.slice(3, 5), 16)
@@ -38,7 +38,6 @@ function drawTable(data) {
     return `rgba(${r}, ${g}, ${b}, ${alpha})`
   }
 
-  // --- Numeric columns ---
   const numericColumns = [
     "AVG. NUMBER OF DAYS PER MONTH WITH SOME RAIN ACROSS YEAR",
     "AVG. MONTHLY RAINFALL ACROSS YEAR",
@@ -55,47 +54,51 @@ function drawTable(data) {
       .range([0.1, 1])
   })
 
-  // --- Create rows ---
+  // --- rows ---
   data.forEach((row, index) => {
     const tr = body.append("tr")
       .attr("data-original-index", index)
 
-    // Rank + destination cell
-    const rankAndDestination = tr.append("td")
+    tr.append("td")
       .attr("class", "rank-and-destination")
+      .html(`
+        <div class="rank" style="background-color:${row.COLOR};">${index + 1}</div>
+        <div class="fi fi-${row.CODE}"></div>
+        <div class="flag">${row.CITY}, ${row.COUNTRY}</div>
+      `)
 
-    rankAndDestination.html(`
-      <div class="rank" style="background-color:${row.COLOR};">${index + 1}</div>
-      <div class="fi fi-${row.CODE}"></div>
-      <div class="flag">${row.CITY}, ${row.COUNTRY}</div>
-    `)
-
-    // ---- CLICK HANDLER ----
     tr.on("click", function () {
       const tbody = body.node()
       const clickedRow = this
 
-      // Restore previously pinned row
+      // --- restore previously pinned row ---
       if (pinnedRow && pinnedRow !== clickedRow) {
         const originalIndex = +pinnedRow.getAttribute("data-original-index")
-        const rows = Array.from(tbody.children).filter(r => r !== pinnedRow)
 
-        // Insert AFTER the pinned slot
-        const referenceNode = rows[originalIndex] || null
+        const rowsWithoutPinned = Array
+          .from(tbody.children)
+          .filter(r => r !== pinnedRow)
+
+        const referenceNode = rowsWithoutPinned[originalIndex] || null
         tbody.insertBefore(pinnedRow, referenceNode)
-        
       }
 
-      // Pin clicked row to top
+      // --- pin clicked row to top ---
       tbody.insertBefore(clickedRow, tbody.firstChild)
       pinnedRow = clickedRow
 
-      // ---- Reset styles ----
+      // --- smooth scroll to top ---
+      tableContainer.node().scrollTo({
+        top: 0,
+        behavior: "smooth"
+      })
+
+      // --- reset styles ---
       d3.selectAll(".rank-and-destination").style("background-color", null)
       d3.selectAll(".flag").style("font-weight", null)
       d3.selectAll("td").style("font-weight", null)
 
-      // ---- Highlight active row ----
+      // --- highlight active row ---
       d3.select(clickedRow)
         .select(".rank-and-destination")
         .style("background-color", "#f0d6c1")
@@ -104,28 +107,25 @@ function drawTable(data) {
         .selectAll(".flag, td")
         .style("font-weight", "bold")
 
-      // ---- Sync map tooltip ----
+      // --- map tooltip sync ---
       const circle = d3.select(`circle[data-city="${row.CITY}"]`)
 
       if (!circle.empty()) {
-        const tooltipContent = `
-          <div class="tooltip">
-            <div class="rank" style="background-color:${row.COLOR}">
-              ${Math.floor(row["OVERALL RANK"]) || "N/A"}
-            </div>
-            <div class="fi fi-${row.CODE}"></div>
-            <div>${row.CITY},</div>
-            <div>${row.COUNTRY}</div>
-          </div>
-        `
-
-        // destroy previous tooltip if exists
         if (circle.node()._tippy) {
           circle.node()._tippy.destroy()
         }
 
         tippy(circle.node(), {
-          content: tooltipContent,
+          content: `
+            <div class="tooltip">
+              <div class="rank" style="background-color:${row.COLOR}">
+                ${Math.floor(row["OVERALL RANK"]) || "N/A"}
+              </div>
+              <div class="fi fi-${row.CODE}"></div>
+              <div>${row.CITY},</div>
+              <div>${row.COUNTRY}</div>
+            </div>
+          `,
           allowHTML: true,
           theme: "light",
           trigger: "manual",
@@ -136,15 +136,12 @@ function drawTable(data) {
       }
     })
 
-    // ---- Numeric columns ----
+    // --- numeric columns ---
     numericColumns.forEach((col, i) => {
       const value = row[col]
-      const opacity = scales[col](value)
-
       tr.append("td")
         .text(col === "AVERAGE HIGHEST TEMP" ? `${value} °C` : value)
-        .attr("class", col.toLowerCase().replace(/\s+/g, "-"))
-        .style("background-color", hexToRgba(colors[i], opacity))
+        .style("background-color", hexToRgba(colors[i], scales[col](value)))
     })
   })
 }
