@@ -161,7 +161,14 @@ function map(mapContainer, geojson, data) {
 
       d3.selectAll(".circle-text").attr("font-size", '16px')
 
+
+
     drawCountryCircles()
+
+     // 🔥 Reset table
+  if (typeof resetTableOrder === "function") {
+    resetTableOrder()
+  }
   })
 
   drawCountryCircles()

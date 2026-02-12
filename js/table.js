@@ -5,6 +5,30 @@ let currentTableData = []
 // ---------------------------------------
 // PIN ROW BY CITY (used by map too)
 // ---------------------------------------
+
+function resetTableOrder() {
+
+  const tbody = d3.select("#table-container tbody").node()
+  if (!tbody) return
+
+  const rows = Array.from(tbody.children)
+
+  // Sort rows by original index
+  rows.sort((a, b) => {
+    return +a.getAttribute("data-original-index") -
+           +b.getAttribute("data-original-index")
+  })
+
+  rows.forEach(row => tbody.appendChild(row))
+
+  // Remove highlight styles
+  d3.selectAll(".rank-and-destination").style("background-color", null)
+  d3.selectAll(".flag").style("font-weight", null)
+  d3.selectAll("td").style("font-weight", null)
+
+  pinnedRow = null
+}
+
 function pinRowByCity(cityName) {
 
   const tbody = d3.select("#table-container tbody").node()
