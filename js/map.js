@@ -104,7 +104,6 @@ function map(mapContainer, geojson, data) {
     features.selectAll("circle")
       .on("click", function (event, d) {
 
-        pinRowByCity(d.CITY)
 
         // if (d.countrySum > 1 && !clicked) {
 
@@ -140,8 +139,12 @@ function map(mapContainer, geojson, data) {
               .each(d => d.originalR = 4)
               .attr("fill", city.COLOR)
               .attr("data-city", city.CITY)
+              .on('click', () => {
+                pinRowByCity(city.CITY)
+              })
 
           })
+          pinRowByCity(d.CITY)
           addCityTooltips()
  
       })
@@ -160,8 +163,6 @@ function map(mapContainer, geojson, data) {
 
 
       d3.selectAll(".circle-text").attr("font-size", '16px')
-
-
 
     drawCountryCircles()
 
