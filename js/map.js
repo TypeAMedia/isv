@@ -1,34 +1,22 @@
 let clicked = false
 
 function map(mapContainer, geojson, data) {
+
   const container = d3.select(mapContainer)
 
-  const params = {
-    width: container.node().getBoundingClientRect().width,
-    height: window.innerWidth > 724 ? 500 : 350,
-    marginTop: 10,
-    marginBottom: 10,
-    marginLeft: 10,
-    marginRight: 10,
-  }
+  const width = container.node().getBoundingClientRect().width
+  const height = window.innerWidth > 724 ? 500 : 350
 
+  const svg = container.append("svg")
+    .attr("width", width)
+    .attr("height", height)
 
-  const svg = container
-    .append('svg')
-    .attr('width', params.width)
-    .attr('height', params.height)
-    .style('cursor', 'pointer')
-
-
-  // Projection
   const projection = d3.geoMercator()
-    .fitSize([params.width, params.height], geojson)
+    .fitSize([width, height], geojson)
 
   const path = d3.geoPath().projection(projection)
 
   const features = svg.append("g")
-
-  // Map paths
 
   features.selectAll("path")
     .data(geojson.features)
@@ -37,20 +25,31 @@ function map(mapContainer, geojson, data) {
     .attr("d", path)
     .attr("fill", "#f0d6c1")
     .attr("stroke", "#fff")
-    .attr("stroke-width", 0.7)
 
-
-  // Zoom functionality
   const zoom = d3.zoom()
     .scaleExtent([1, 8])
     .on("zoom", (event) => {
+
       features.attr("transform", event.transform)
+
+      const k = event.transform.k
+
+      features.selectAll("circle")
+        .attr("r", d => (d.originalR / k) + 0.8)
+
+      features.selectAll(".circle-text")
+        .attr("font-size", 14 / k + "px")
     })
 
-  svg.call(zoom).on("wheel.zoom", null).on('dblclick.zoom', null)
+  svg.call(zoom)
+    .on("wheel.zoom", null)
+    .on("dblclick.zoom", null)
 
-  // Data Prep
-  const countryCounts = d3.rollup(data, v => v.length, d => d.COUNTRY)
+  const countryCounts = d3.rollup(
+    data,
+    v => v.length,
+    d => d.COUNTRY
+  )
 
   data.forEach(city => {
     city.countrySum = countryCounts.get(city.COUNTRY) || 0
@@ -60,134 +59,139 @@ function map(mapContainer, geojson, data) {
     .domain([0, d3.max(data, d => d.countrySum)])
     .range([5, 15])
 
-
-
-  // Draw country circles
   function drawCountryCircles() {
+
     features.selectAll("circle").remove()
     features.selectAll(".circle-text").remove()
 
     geojson.features.forEach(feature => {
+
       const countryName = feature.properties.name
       const countryData = data.find(d => d.COUNTRY === countryName)
       if (!countryData) return
 
-
       const centroid = path.centroid(feature)
+      const radius = circleScale(countryData.countrySum)
 
       features.append("circle")
         .datum(countryData)
         .attr("cx", centroid[0])
         .attr("cy", centroid[1])
-        .attr("r", circleScale(countryData.countrySum))
+        .attr("r", radius)
+        .each(d => d.originalR = radius)
         .attr("fill", countryData.countrySum !== 1 ? "#B29480" : countryData.COLOR)
-        .attr("stroke", "#fff")
-        .attr("stroke-width", 0.5)
-        .attr('data-city', countryData.CITY)
+        .attr("data-city", countryData.CITY)
+        .style('cursor', 'pointer')
 
       features.append("text")
         .attr("class", "circle-text")
         .attr("x", centroid[0])
         .attr("y", centroid[1])
-        .attr("dy", "0.35em")
+        .style('fill', '#fff')
         .attr("text-anchor", "middle")
-        .attr("font-family", "Roboto")
-        .attr("font-size", "14px")
-        .attr("fill", "#fff")
+        .attr("dy", "0.35em")
+        .style('cursor', 'pointer')
         .style("pointer-events", "none")
-        .text(countryData.countrySum === 1 ? "" : countryData.countrySum)
+        .text(countryData.countrySum > 1 ? countryData.countrySum : "")
     })
 
     attachCircleClick()
     addCityTooltips()
   }
 
-
-  // Circle click handle
   function attachCircleClick() {
+
     features.selectAll("circle")
       .on("click", function (event, d) {
-        clicked = true
-        features.selectAll("circle").remove()
-        features.selectAll(".circle-text").remove()
 
-        const x = +d3.select(this).attr("cx")
-        const y = +d3.select(this).attr("cy")
-        const scale = 4
+        pinRowByCity(d.CITY)
 
-        svg.transition()
-          .duration(750)
-          .call(
-            zoom.transform,
-            d3.zoomIdentity
-              .translate(params.width / 2 - x * scale, params.height / 2 - y * scale)
-              .scale(scale)
-          )
+        // if (d.countrySum > 1 && !clicked) {
 
-        const citiesInCountry = data.filter(city => city.COUNTRY === d.COUNTRY)
+          clicked = true
 
-        citiesInCountry.forEach(city => {
-          const [cx, cy] = projection([city.LONGITUDE, city.LATITUDE])
+          features.selectAll("circle").remove()
+          features.selectAll(".circle-text").remove()
 
-          features.append("circle")
-            .datum(city)
-            .attr("cx", cx)
-            .attr("cy", cy)
-            .attr("r", 4)
-            .attr("fill", city.COLOR)
-            .attr("stroke", "#fff")
-            .attr("stroke-width", 0.5)
-            .attr('data-city', city.CITY)
-        })
+          const x = +d3.select(this).attr("cx")
+          const y = +d3.select(this).attr("cy")
+          const scale = 4
 
-        addCityTooltips()
+          svg.transition()
+            .duration(750)
+            .call(
+              zoom.transform,
+              d3.zoomIdentity
+                .translate(width / 2 - x * scale, height / 2 - y * scale)
+                .scale(scale)
+            )
+
+          const cities = data.filter(city => city.COUNTRY === d.COUNTRY)
+
+          cities.forEach(city => {
+
+            const [cx, cy] = projection([city.LONGITUDE, city.LATITUDE])
+
+            features.append("circle")
+              .datum(city)
+              .attr("cx", cx)
+              .attr("cy", cy)
+              .attr("r", 4)
+              .each(d => d.originalR = 4)
+              .attr("fill", city.COLOR)
+              .attr("data-city", city.CITY)
+
+          })
+          addCityTooltips()
+ 
       })
   }
 
-  // Reset zoom buttons
-  d3.select('.plus').on('click', () => {
-    svg.transition().duration(750).call(zoom.scaleTo, 4)
-    d3.selectAll('circle').attr('r', 5.5)
-    d3.selectAll('.circle-text').attr('font-size', '6px')
+  d3.select(".plus").on("click", () => {
+    svg.transition().duration(750).call(zoom.scaleBy, 1.5)
   })
 
-  d3.select('.minus').on('click', () => {
+  d3.select(".minus").on("click", () => {
+    clicked = false
+
     svg.transition()
       .duration(750)
       .call(zoom.transform, d3.zoomIdentity)
-    d3.selectAll('circle').attr('r', (d) => circleScale(d.countrySum))
-    d3.selectAll('.circle-text').attr('font-size', '14px')
+
+
+      d3.selectAll(".circle-text").attr("font-size", '16px')
+
     drawCountryCircles()
   })
+
   drawCountryCircles()
-  return { attachCircleClick: attachCircleClick() }
-}
 
+  function addCityTooltips() {
 
-// Tooltip functionality
-function addCityTooltips() {
-  d3.selectAll("circle")
-    .each(function (d) {
-      if (d.countrySum > 1 && !clicked) return
-      if (!d) return
-
-      const tooltipContent = `
-        <div class='tooltip'>
-          <div class='rank' style='background-color:${d.COLOR}'>
-            ${Math.floor(d["OVERALL RANK"]) || "N/A"}
+    features.selectAll("circle")
+      .each(function (d) {
+  
+        if (!d) return
+        if (d.countrySum > 1 && !clicked) return
+  
+        const tooltipContent = `
+          <div class='tooltip'>
+            <div class='rank' style='background-color:${d.COLOR}'>
+              ${Math.floor(d["OVERALL RANK"]) || "N/A"}
+            </div>
+            <div class='fi fi-${d.CODE}'></div>
+            <div>${d.CITY},</div>
+            <div>${d.COUNTRY}</div>
           </div>
-          <div class='fi fi-${d.CODE}'></div>
-          <div>${d.CITY},</div>
-          <div>${d.COUNTRY}</div>
-        </div>
-      `
-
-      tippy(this, {
-        content: tooltipContent,
-        allowHTML: true,
-        theme: 'light'
+        `
+  
+        tippy(this, {
+          content: tooltipContent,
+          allowHTML: true,
+          theme: 'light',
+          placement: 'top'
+        })
       })
-    })
-
+  }
+  
 }
-

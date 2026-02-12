@@ -1,14 +1,68 @@
 // Track currently pinned row
 let pinnedRow = null
+let currentTableData = []
 
+// ---------------------------------------
+// PIN ROW BY CITY (used by map too)
+// ---------------------------------------
+function pinRowByCity(cityName) {
+
+  const tbody = d3.select("#table-container tbody").node()
+  if (!tbody) return
+
+  const targetRow = d3.select(`tr[data-city="${cityName}"]`).node()
+  if (!targetRow) return
+
+  const rows = Array.from(tbody.children)
+
+  // Restore previous pinned row
+  if (pinnedRow && pinnedRow !== targetRow) {
+    const originalIndex = +pinnedRow.getAttribute("data-original-index")
+
+    const rowsWithoutPinned = rows.filter(r => r !== pinnedRow)
+    const referenceNode = rowsWithoutPinned[originalIndex] || null
+
+    tbody.insertBefore(pinnedRow, referenceNode)
+  }
+
+  // Move new row to top
+  tbody.insertBefore(targetRow, tbody.firstChild)
+  pinnedRow = targetRow
+
+  // Smooth scroll to top
+  d3.select("#table-container").node().scrollTo({
+    top: 0,
+    behavior: "smooth"
+  })
+
+  // Reset styles
+  d3.selectAll(".rank-and-destination").style("background-color", null)
+  d3.selectAll(".flag").style("font-weight", null)
+  d3.selectAll("td").style("font-weight", null)
+
+  // Highlight
+  d3.select(targetRow)
+    .select(".rank-and-destination")
+    .style("background-color", "#f0d6c1")
+
+  d3.select(targetRow)
+    .selectAll(".flag, td")
+    .style("font-weight", "bold")
+}
+
+
+// ---------------------------------------
+// DRAW TABLE
+// ---------------------------------------
 function drawTable(data) {
+
+  currentTableData = data
+
   const tableContainer = d3.select("#table-container")
   tableContainer.html("")
 
   const table = tableContainer.append("table")
     .attr("class", "data-table")
-
-  const colors = ['#3BC3B7', '#13A098', '#AED457', '#FFBB56', '#F2A45C', '#FB8361']
 
   const headers = [
     "Destination",
@@ -30,7 +84,8 @@ function drawTable(data) {
 
   const body = table.append("tbody")
 
-  // --- helpers ---
+  const colors = ['#3BC3B7', '#13A098', '#AED457', '#FFBB56', '#F2A45C', '#FB8361']
+
   function hexToRgba(hex, alpha) {
     const r = parseInt(hex.slice(1, 3), 16)
     const g = parseInt(hex.slice(3, 5), 16)
@@ -54,10 +109,11 @@ function drawTable(data) {
       .range([0.1, 1])
   })
 
-  // --- rows ---
   data.forEach((row, index) => {
+
     const tr = body.append("tr")
       .attr("data-original-index", index)
+      .attr("data-city", row.CITY)
 
     tr.append("td")
       .attr("class", "rank-and-destination")
@@ -67,78 +123,20 @@ function drawTable(data) {
         <div class="flag">${row.CITY}, ${row.COUNTRY}</div>
       `)
 
+    // Row click → sync map
     tr.on("click", function () {
-      const tbody = body.node()
-      const clickedRow = this
 
-      // --- restore previously pinned row ---
-      if (pinnedRow && pinnedRow !== clickedRow) {
-        const originalIndex = +pinnedRow.getAttribute("data-original-index")
+      pinRowByCity(row.CITY)
 
-        const rowsWithoutPinned = Array
-          .from(tbody.children)
-          .filter(r => r !== pinnedRow)
-
-        const referenceNode = rowsWithoutPinned[originalIndex] || null
-        tbody.insertBefore(pinnedRow, referenceNode)
-      }
-
-      // --- pin clicked row to top ---
-      tbody.insertBefore(clickedRow, tbody.firstChild)
-      pinnedRow = clickedRow
-
-      // --- smooth scroll to top ---
-      tableContainer.node().scrollTo({
-        top: 0,
-        behavior: "smooth"
-      })
-
-      // --- reset styles ---
-      d3.selectAll(".rank-and-destination").style("background-color", null)
-      d3.selectAll(".flag").style("font-weight", null)
-      d3.selectAll("td").style("font-weight", null)
-
-      // --- highlight active row ---
-      d3.select(clickedRow)
-        .select(".rank-and-destination")
-        .style("background-color", "#f0d6c1")
-
-      d3.select(clickedRow)
-        .selectAll(".flag, td")
-        .style("font-weight", "bold")
-
-      // --- map tooltip sync ---
       const circle = d3.select(`circle[data-city="${row.CITY}"]`)
-
-      if (!circle.empty()) {
-        if (circle.node()._tippy) {
-          circle.node()._tippy.destroy()
-        }
-
-        tippy(circle.node(), {
-          content: `
-            <div class="tooltip">
-              <div class="rank" style="background-color:${row.COLOR}">
-                ${Math.floor(row["OVERALL RANK"]) || "N/A"}
-              </div>
-              <div class="fi fi-${row.CODE}"></div>
-              <div>${row.CITY},</div>
-              <div>${row.COUNTRY}</div>
-            </div>
-          `,
-          allowHTML: true,
-          theme: "light",
-          trigger: "manual",
-          placement: "top"
-        })
-
+      if (!circle.empty() && circle.node()._tippy) {
         circle.node()._tippy.show()
       }
     })
 
-    // --- numeric columns ---
     numericColumns.forEach((col, i) => {
       const value = row[col]
+
       tr.append("td")
         .text(col === "AVERAGE HIGHEST TEMP" ? `${value} °C` : value)
         .style("background-color", hexToRgba(colors[i], scales[col](value)))
