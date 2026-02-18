@@ -152,9 +152,16 @@ function drawTable(data) {
 
       pinRowByCity(row.CITY)
 
+      if (typeof focusCityOnMap === "function") {
+        focusCityOnMap(row)
+        return
+      }
+
+      // Fallback: if circle already exists, show tooltip
       const circle = d3.select(`circle[data-city="${row.CITY}"]`)
       if (!circle.empty() && circle.node()._tippy) {
         circle.node()._tippy.show()
+        setTimeout(() => circle.node()._tippy.hide(), 3000)
       }
     })
 

@@ -81,6 +81,7 @@ function map(mapContainer, geojson, data) {
         .each(d => d.originalR = radius)
         .attr("fill", countryData.countrySum !== 1 ? "#B29480" : countryData.COLOR)
         .attr("data-city", countryData.CITY)
+        .attr("data-country", countryName)
         .style('cursor', 'pointer')
 
       features.append("text")
@@ -139,12 +140,12 @@ function map(mapContainer, geojson, data) {
               .each(d => d.originalR = 4)
               .attr("fill", city.COLOR)
               .attr("data-city", city.CITY)
+              .attr("data-country", city.COUNTRY)
               .on('click', () => {
                 pinRowByCity(city.CITY)
               })
 
           })
-          pinRowByCity(d.CITY)
           addCityTooltips()
  
       })
@@ -200,6 +201,39 @@ function map(mapContainer, geojson, data) {
           placement: 'top'
         })
       })
+  }
+
+  // Expose a helper for table → map sync:
+  // - If a city circle isn't visible yet (because the country has multiple cities),
+  //   expand that country first, then show the city's tooltip.
+  window.focusCityOnMap = function (row) {
+    if (!row || !row.CITY || !row.COUNTRY) return
+
+    const cityName = row.CITY
+    const countryName = row.COUNTRY
+
+    // If the circle already exists (either a city circle, or a single-city country circle), show it.
+    const direct = features.select(`circle[data-city="${cityName}"]`)
+    if (!direct.empty() && direct.node()._tippy) {
+      direct.node()._tippy.show()
+      setTimeout(() => direct.node()._tippy.hide(), 3000)
+      return
+    }
+
+    // Otherwise expand the country (this draws city circles + tooltips).
+    const countryCircle = features.selectAll("circle").filter(d => d && d.COUNTRY === countryName)
+    if (countryCircle.empty()) return
+
+    countryCircle.dispatch("click")
+
+    // After expansion + zoom transition, show the city tooltip.
+    setTimeout(() => {
+      const cityCircle = features.select(`circle[data-city="${cityName}"]`)
+      if (!cityCircle.empty() && cityCircle.node()._tippy) {
+        cityCircle.node()._tippy.show()
+        setTimeout(() => cityCircle.node()._tippy.hide(), 3000)
+      }
+    }, 900)
   }
   
 }
