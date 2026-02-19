@@ -1,4 +1,5 @@
 let clicked = false
+let expandedCountry = null
 
 function map(mapContainer, geojson, data) {
 
@@ -105,10 +106,8 @@ function map(mapContainer, geojson, data) {
     features.selectAll("circle")
       .on("click", function (event, d) {
 
-
-        // if (d.countrySum > 1 && !clicked) {
-
           clicked = true
+          expandedCountry = d.COUNTRY
 
           features.selectAll("circle").remove()
           features.selectAll(".circle-text").remove()
@@ -155,23 +154,20 @@ function map(mapContainer, geojson, data) {
     svg.transition().duration(750).call(zoom.scaleBy, 1.5)
   })
 
-  d3.select(".minus").on("click", () => {
+  function resetToCountryView(skipTableReset) {
     clicked = false
-
+    expandedCountry = null
     svg.transition()
       .duration(750)
       .call(zoom.transform, d3.zoomIdentity)
-
-
-      d3.selectAll(".circle-text").attr("font-size", '16px')
-
+    d3.selectAll(".circle-text").attr("font-size", '16px')
     drawCountryCircles()
-
-     // 🔥 Reset table
-  if (typeof resetTableOrder === "function") {
-    resetTableOrder()
+    if (!skipTableReset && typeof resetTableOrder === "function") {
+      resetTableOrder()
+    }
   }
-  })
+
+  d3.select(".minus").on("click", () => resetToCountryView(false))
 
   drawCountryCircles()
 
@@ -204,15 +200,16 @@ function map(mapContainer, geojson, data) {
   }
 
   // Expose a helper for table → map sync:
-  // - If a city circle isn't visible yet (because the country has multiple cities),
-  //   expand that country first, then show the city's tooltip.
+  // - If another country is expanded, reset to primary view first, then expand target country and show city tooltip.
+  // - If the city circle is already visible, just show its tooltip.
+  // - Otherwise expand the country, then show the city's tooltip.
   window.focusCityOnMap = function (row) {
     if (!row || !row.CITY || !row.COUNTRY) return
 
     const cityName = row.CITY
     const countryName = row.COUNTRY
 
-    // If the circle already exists (either a city circle, or a single-city country circle), show it.
+    // If the circle already exists (city circle or single-city country), show tooltip.
     const direct = features.select(`circle[data-city="${cityName}"]`)
     if (!direct.empty() && direct.node()._tippy) {
       direct.node()._tippy.show()
@@ -220,13 +217,30 @@ function map(mapContainer, geojson, data) {
       return
     }
 
-    // Otherwise expand the country (this draws city circles + tooltips).
+    // If a different country is currently expanded, reset to primary view first, then expand target country.
+    if (clicked && expandedCountry && expandedCountry !== countryName) {
+      resetToCountryView(true)
+      setTimeout(() => {
+        const countryCircle = features.selectAll("circle").filter(d => d && d.COUNTRY === countryName)
+        if (countryCircle.empty()) return
+        countryCircle.dispatch("click")
+        setTimeout(() => {
+          const cityCircle = features.select(`circle[data-city="${cityName}"]`)
+          if (!cityCircle.empty() && cityCircle.node()._tippy) {
+            cityCircle.node()._tippy.show()
+            setTimeout(() => cityCircle.node()._tippy.hide(), 3000)
+          }
+        }, 900)
+      }, 800)
+      return
+    }
+
+    // Same country expanded or not expanded: expand the country (if needed) and show city tooltip.
     const countryCircle = features.selectAll("circle").filter(d => d && d.COUNTRY === countryName)
     if (countryCircle.empty()) return
 
     countryCircle.dispatch("click")
 
-    // After expansion + zoom transition, show the city tooltip.
     setTimeout(() => {
       const cityCircle = features.select(`circle[data-city="${cityName}"]`)
       if (!cityCircle.empty() && cityCircle.node()._tippy) {
